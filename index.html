@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Your App Name Here — Photo Enhancer</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Your App Name Here</div>
+    <div class="header-actions">
+      <input id="upload" type="file" accept="image/*" />
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="viewer">
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <canvas id="overlay" class="overlay"></canvas>
+      </div>
+      <div class="bottom-controls">
+        <button id="undoBtn" title="Undo">↶ Undo</button>
+        <button id="resetBtn" title="Reset all edits">Reset</button>
+        <button id="downloadBtn" title="Download image">💾 Download</button>
+      </div>
+    </section>
+
+    <aside id="sidePanel" class="side-panel">
+      <div class="panel-header">
+        <h2>Tools</h2>
+        <button id="closePanel" class="close">✕</button>
+      </div>
+
+      <div class="control-group">
+        <label>Brightness <span id="bVal">100</span>%</label>
+        <input id="brightness" type="range" min="0" max="200" value="100" />
+      </div>
+
+      <div class="control-group">
+        <label>Contrast <span id="cVal">100</span>%</label>
+        <input id="contrast" type="range" min="0" max="200" value="100" />
+      </div>
+
+      <div class="control-group">
+        <label>Saturation <span id="sVal">100</span>%</label>
+        <input id="saturation" type="range" min="0" max="300" value="100" />
+      </div>
+
+      <div class="control-group">
+        <label>Blur <span id="blurVal">0</span>px</label>
+        <input id="blur" type="range" min="0" max="8" value="0" />
+      </div>
+
+      <div class="control-row">
+        <button id="rotateLeft">⟲ Rotate</button>
+        <button id="rotateRight">⟳ Rotate</button>
+        <button id="flipH">↔ Flip</button>
+        <button id="flipV">↕ Flip</button>
+      </div>
+
+      <div class="control-group">
+        <label>Resize (px)</label>
+        <input id="resizeW" type="number" placeholder="Width" min="50" />
+        <input id="resizeH" type="number" placeholder="Height" min="50" />
+        <button id="applyResize">Apply</button>
+      </div>
+
+      <div class="control-group">
+        <button id="cropMode">✂ Crop (drag)</button>
+        <button id="applyCrop">Apply Crop</button>
+        <button id="cancelCrop">Cancel Crop</button>
+      </div>
+
+      <div class="filters">
+        <p>Filters</p>
+        <div class="filter-row">
+          <button data-filter="none">None</button>
+          <button data-filter="grayscale(100%)">B&W</button>
+          <button data-filter="sepia(70%)">Vintage</button>
+          <button data-filter="contrast(120%) saturate(140%)">Vivid</button>
+          <button data-filter="hue-rotate(15deg) saturate(120%)">Warm</button>
+        </div>
+      </div>
+
+      <div style="flex:1"></div>
+      <div class="panel-footer">
+        <small>Works offline — edits happen in your browser.</small>
+      </div>
+    </aside>
+
+    <button id="openPanel" class="fab">☰</button>
+  </main>
+
+<script src="script.js"></script>
+</body>
+</html>
