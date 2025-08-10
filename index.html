@@ -5,106 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Enhanceify - Photo Enhancer</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Minimal styles to illustrate layout */
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
-    header, footer { background: #222; color: white; text-align: center; padding: 10px 0; }
-    main { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 20px; }
-    #canvas, #overlay { border: 1px solid #ccc; max-width: 90vw; max-height: 60vh; }
-    .controls, .filters, .resize-crop, .slider-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
-
-    button, input[type=range], input[type=number], input[type=file] { cursor: pointer; }
-    #sidePanel { max-width: 300px; background: #f0f0f0; border-left: 1px solid #ccc; padding: 10px; overflow-y: auto; }
-    #sidePanel.open { display: block; }
-    #sidePanel.closed { display: none; }
-    .filter-row button { padding: 5px 10px; }
-    .slider-group label { min-width: 70px; }
-    .slider-group span { width: 30px; text-align: center; display: inline-block; }
-    #overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
-    .canvas-container { position: relative; display: inline-block; }
-
-    /* Mobile panel toggles */
-    #openPanel, #closePanel { display: none; padding: 8px 12px; background-color: #222; color: white; border: none; cursor: pointer; margin: 5px; }
-    @media (max-width: 700px) {
-      main { flex-direction: column; align-items: center; }
-      #sidePanel { position: fixed; top: 0; right: 0; height: 100vh; display: none; box-shadow: -2px 0 5px rgba(0,0,0,0.3); }
-      #sidePanel.open { display: block; }
-      #openPanel, #closePanel { display: inline-block; }
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <h1>Enhanceify - Photo Enhancer</h1>
+  <header class="site-header">
+    <div class="brand">Enhanceify - Photo Enhancer</div>
+    <input type="file" id="upload" accept="image/*" />
   </header>
 
-  <main>
-    <div>
-      <input type="file" id="upload" accept="image/*" />
-      <button id="undoBtn" disabled>Undo</button>
-      <button id="resetBtn">Reset</button>
-      <button id="downloadBtn">Download</button>
-      <button id="cropMode">Crop Mode</button>
-      <button id="applyCrop">Apply Crop</button>
-      <button id="cancelCrop">Cancel Crop</button>
-    </div>
+  <div class="container">
+    <main class="viewer">
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <canvas id="overlay" class="overlay"></canvas>
+      </div>
+      <div class="bottom-controls">
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="resetBtn">Reset</button>
+        <button id="downloadBtn">Download</button>
+        <button id="cropMode">Crop Mode</button>
+        <button id="applyCrop" disabled>Apply Crop</button>
+        <button id="cancelCrop" disabled>Cancel Crop</button>
+      </div>
+    </main>
 
-    <div class="canvas-container">
-      <canvas id="canvas"></canvas>
-      <canvas id="overlay" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
-    </div>
+    <aside id="sidePanel" class="side-panel">
+      <div class="panel-header">
+        <h2>Adjustments</h2>
+      </div>
 
-    <div id="sidePanel" class="closed">
-      <button id="closePanel">Close Panel</button>
-
-      <section class="slider-group">
-        <label for="brightness">Brightness</label>
+      <div class="control-group slider-group">
+        <label for="brightness">Brightness <span id="bVal">100</span>%</label>
         <input type="range" id="brightness" min="0" max="200" value="100" />
-        <span id="bVal">100</span>
-      </section>
+      </div>
 
-      <section class="slider-group">
-        <label for="contrast">Contrast</label>
+      <div class="control-group slider-group">
+        <label for="contrast">Contrast <span id="cVal">100</span>%</label>
         <input type="range" id="contrast" min="0" max="200" value="100" />
-        <span id="cVal">100</span>
-      </section>
+      </div>
 
-      <section class="slider-group">
-        <label for="saturation">Saturation</label>
+      <div class="control-group slider-group">
+        <label for="saturation">Saturation <span id="sVal">100</span>%</label>
         <input type="range" id="saturation" min="0" max="200" value="100" />
-        <span id="sVal">100</span>
-      </section>
+      </div>
 
-      <section class="slider-group">
-        <label for="blur">Blur</label>
+      <div class="control-group slider-group">
+        <label for="blur">Blur <span id="blVal">0</span>px</label>
         <input type="range" id="blur" min="0" max="10" value="0" />
-        <span id="bVal">0</span>
-      </section>
+      </div>
 
-      <section class="filters filter-row">
-        <button type="button" data-filter="none">None</button>
+      <div class="control-group filter-row">
+        <button type="button" data-filter="none" class="active">None</button>
         <button type="button" data-filter="grayscale(100%)">Grayscale</button>
         <button type="button" data-filter="sepia(100%)">Sepia</button>
         <button type="button" data-filter="invert(100%)">Invert</button>
         <button type="button" data-filter="contrast(150%)">High Contrast</button>
-      </section>
+      </div>
 
-      <section class="controls">
-        <button id="rotateLeft">Rotate Left</button>
-        <button id="rotateRight">Rotate Right</button>
-        <button id="flipH">Flip Horizontal</button>
-        <button id="flipV">Flip Vertical</button>
-      </section>
+      <div class="control-group controls">
+        <button id="rotateLeft" title="Rotate Left">&#8634;</button>
+        <button id="rotateRight" title="Rotate Right">&#8635;</button>
+        <button id="flipH" title="Flip Horizontal">&#8646;</button>
+        <button id="flipV" title="Flip Vertical">&#8645;</button>
+      </div>
 
-      <section class="resize-crop">
+      <div class="control-group resize-crop">
         <input type="number" id="resizeW" placeholder="Width (px)" min="1" />
         <input type="number" id="resizeH" placeholder="Height (px)" min="1" />
         <button id="applyResize">Apply Resize</button>
-      </section>
-    </div>
+      </div>
+    </aside>
+  </div>
 
-    <button id="openPanel">Open Panel</button>
-  </main>
+  <button id="openPanel" class="fab" aria-label="Toggle Controls Panel">⚙️</button>
 
   <footer>
     <p>&copy; 2025 Enhanceify</p>
@@ -113,4 +85,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
