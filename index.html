@@ -1,99 +1,116 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Your App Name Here — Photo Enhancer</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enhanceify - Photo Enhancer</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Minimal styles to illustrate layout */
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+    header, footer { background: #222; color: white; text-align: center; padding: 10px 0; }
+    main { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 20px; }
+    #canvas, #overlay { border: 1px solid #ccc; max-width: 90vw; max-height: 60vh; }
+    .controls, .filters, .resize-crop, .slider-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+
+    button, input[type=range], input[type=number], input[type=file] { cursor: pointer; }
+    #sidePanel { max-width: 300px; background: #f0f0f0; border-left: 1px solid #ccc; padding: 10px; overflow-y: auto; }
+    #sidePanel.open { display: block; }
+    #sidePanel.closed { display: none; }
+    .filter-row button { padding: 5px 10px; }
+    .slider-group label { min-width: 70px; }
+    .slider-group span { width: 30px; text-align: center; display: inline-block; }
+    #overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+    .canvas-container { position: relative; display: inline-block; }
+
+    /* Mobile panel toggles */
+    #openPanel, #closePanel { display: none; padding: 8px 12px; background-color: #222; color: white; border: none; cursor: pointer; margin: 5px; }
+    @media (max-width: 700px) {
+      main { flex-direction: column; align-items: center; }
+      #sidePanel { position: fixed; top: 0; right: 0; height: 100vh; display: none; box-shadow: -2px 0 5px rgba(0,0,0,0.3); }
+      #sidePanel.open { display: block; }
+      #openPanel, #closePanel { display: inline-block; }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">Your App Name Here</div>
-    <div class="header-actions">
-      <input id="upload" type="file" accept="image/*" />
-    </div>
+  <header>
+    <h1>Enhanceify - Photo Enhancer</h1>
   </header>
 
-  <main class="container">
-    <section class="viewer">
-      <div class="canvas-wrap">
-        <canvas id="canvas"></canvas>
-        <canvas id="overlay" class="overlay"></canvas>
-      </div>
-      <div class="bottom-controls">
-        <button id="undoBtn" title="Undo">↶ Undo</button>
-        <button id="resetBtn" title="Reset all edits">Reset</button>
-        <button id="downloadBtn" title="Download image">💾 Download</button>
-      </div>
-    </section>
+  <main>
+    <div>
+      <input type="file" id="upload" accept="image/*" />
+      <button id="undoBtn" disabled>Undo</button>
+      <button id="resetBtn">Reset</button>
+      <button id="downloadBtn">Download</button>
+      <button id="cropMode">Crop Mode</button>
+      <button id="applyCrop">Apply Crop</button>
+      <button id="cancelCrop">Cancel Crop</button>
+    </div>
 
-    <aside id="sidePanel" class="side-panel">
-      <div class="panel-header">
-        <h2>Tools</h2>
-        <button id="closePanel" class="close">✕</button>
-      </div>
+    <div class="canvas-container">
+      <canvas id="canvas"></canvas>
+      <canvas id="overlay" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+    </div>
 
-      <div class="control-group">
-        <label>Brightness <span id="bVal">100</span>%</label>
-        <input id="brightness" type="range" min="0" max="200" value="100" />
-      </div>
+    <div id="sidePanel" class="closed">
+      <button id="closePanel">Close Panel</button>
 
-      <div class="control-group">
-        <label>Contrast <span id="cVal">100</span>%</label>
-        <input id="contrast" type="range" min="0" max="200" value="100" />
-      </div>
+      <section class="slider-group">
+        <label for="brightness">Brightness</label>
+        <input type="range" id="brightness" min="0" max="200" value="100" />
+        <span id="bVal">100</span>
+      </section>
 
-      <div class="control-group">
-        <label>Saturation <span id="sVal">100</span>%</label>
-        <input id="saturation" type="range" min="0" max="300" value="100" />
-      </div>
+      <section class="slider-group">
+        <label for="contrast">Contrast</label>
+        <input type="range" id="contrast" min="0" max="200" value="100" />
+        <span id="cVal">100</span>
+      </section>
 
-      <div class="control-group">
-        <label>Blur <span id="blurVal">0</span>px</label>
-        <input id="blur" type="range" min="0" max="8" value="0" />
-      </div>
+      <section class="slider-group">
+        <label for="saturation">Saturation</label>
+        <input type="range" id="saturation" min="0" max="200" value="100" />
+        <span id="sVal">100</span>
+      </section>
 
-      <div class="control-row">
-        <button id="rotateLeft">⟲ Rotate</button>
-        <button id="rotateRight">⟳ Rotate</button>
-        <button id="flipH">↔ Flip</button>
-        <button id="flipV">↕ Flip</button>
-      </div>
+      <section class="slider-group">
+        <label for="blur">Blur</label>
+        <input type="range" id="blur" min="0" max="10" value="0" />
+        <span id="bVal">0</span>
+      </section>
 
-      <div class="control-group">
-        <label>Resize (px)</label>
-        <input id="resizeW" type="number" placeholder="Width" min="50" />
-        <input id="resizeH" type="number" placeholder="Height" min="50" />
-        <button id="applyResize">Apply</button>
-      </div>
+      <section class="filters filter-row">
+        <button type="button" data-filter="none">None</button>
+        <button type="button" data-filter="grayscale(100%)">Grayscale</button>
+        <button type="button" data-filter="sepia(100%)">Sepia</button>
+        <button type="button" data-filter="invert(100%)">Invert</button>
+        <button type="button" data-filter="contrast(150%)">High Contrast</button>
+      </section>
 
-      <div class="control-group">
-        <button id="cropMode">✂ Crop (drag)</button>
-        <button id="applyCrop">Apply Crop</button>
-        <button id="cancelCrop">Cancel Crop</button>
-      </div>
+      <section class="controls">
+        <button id="rotateLeft">Rotate Left</button>
+        <button id="rotateRight">Rotate Right</button>
+        <button id="flipH">Flip Horizontal</button>
+        <button id="flipV">Flip Vertical</button>
+      </section>
 
-      <div class="filters">
-        <p>Filters</p>
-        <div class="filter-row">
-          <button data-filter="none">None</button>
-          <button data-filter="grayscale(100%)">B&W</button>
-          <button data-filter="sepia(70%)">Vintage</button>
-          <button data-filter="contrast(120%) saturate(140%)">Vivid</button>
-          <button data-filter="hue-rotate(15deg) saturate(120%)">Warm</button>
-        </div>
-      </div>
+      <section class="resize-crop">
+        <input type="number" id="resizeW" placeholder="Width (px)" min="1" />
+        <input type="number" id="resizeH" placeholder="Height (px)" min="1" />
+        <button id="applyResize">Apply Resize</button>
+      </section>
+    </div>
 
-      <div style="flex:1"></div>
-      <div class="panel-footer">
-        <small>Works offline — edits happen in your browser.</small>
-      </div>
-    </aside>
-
-    <button id="openPanel" class="fab">☰</button>
+    <button id="openPanel">Open Panel</button>
   </main>
 
-<script src="script.js"></script>
+  <footer>
+    <p>&copy; 2025 Enhanceify</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
+
