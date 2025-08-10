@@ -1,2 +1,2 @@
 # Enhanceify
-Instantly turn your photos into masterpieces.
+Instantly turn your pictures into masterpieces.
